@@ -102,7 +102,7 @@
         }
 
         .form__label {
-            font-family: 'Roboto', sans-serif;
+            font-family: "Roboto", sans-serif;
             font-size: 2.2rem;
             margin-bottom: 0.7rem;
             display: block;
@@ -111,7 +111,7 @@
         }
 
         .form__input {
-            font-family: 'Roboto', sans-serif;
+            font-family: "Roboto", sans-serif;
             color: rgb(0, 0, 0);
             font-size: 2rem;
             margin: 0 auto;
@@ -141,50 +141,182 @@
             animation-name: slidein;
             -webkit-animation-delay: -0.5s;
             animation-delay: -0.5s;
-
-        }
-
-        @keyframes slidein {
-            from {
-                margin-left: 100%;
-                width: 300%;
-            }
-
-            to {
-                margin-left: 100%;
-                padding-left: 5.4%;
-                width: 100%;
-            }
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1
-            style="-webkit-text-stroke: 0.1px black;font-weight:700; margin:0; padding:0; margin-bottom:.3em; font-size:3em; color:rgb(255, 255, 255)">
-            Mersenne Twister </h1>
-        <h2 style="margin:0; padding:0; font-size:2.2em;">Número generado aleatoriamente: </h2>
-        <div style="-webkit-text-stroke: 0.1px black;font-weight:700; margin: 0.5em 4em 1em 0; padding-left:8.4%; font-size:6.5em; color:rgb(246, 254, 255); "
-            id="resultado">
-        </div>
-        <div class="formulario">
+        <h1 style="
+          -webkit-text-stroke: 0.1px black;
+          font-weight: 700;
+          margin: 0;
+          padding: 0;
+          margin-bottom: 0.3em;
+          font-size: 3em;
+          color: rgb(255, 255, 255);
+        ">
+            Mersenne Twister
+        </h1>
+        <h2 style="margin: 0; padding: 0; font-size: 2.2em">
+            Números generados aleatoriamente:
+        </h2>
+        <textarea rows="50" cols="50" style="
+          -webkit-text-stroke: 0.1px black;
+          font-weight: 700;
+          margin: 1.5em 4em 0em 0;
+          margin-left: 8.5%;
+          width:50vw;
+          height:60vh;
+          overflow-x:scroll;
+          overflow-y:scroll;
+          font-size: 1.46em;
+          
+        " id="resultado"></textarea>
+        <div class="formulario" style="margin-bottom:30vh;">
             <form action="">
-                <label for="semilla" class="form__label">Semilla: </label>
-                <input type="number" name="seed" id="seed_value" class="form__input" min="0" max="99999" /><br />
-                <button class="big-button semilla" type="submit" onclick="aleatorio();">
-                    Generar número aleatorio</button><br />
-                <button class="big-button" type="reset">Limpiar</button><br />
+                <label for="semilla" class="form__label">Seed: </label>
+                <input type="number" name="seed" id="seed_value" class="form__input" min="0" max="99999"
+                    value="123" /><br />
+                <label for="rangos" class="form__label"
+                    style="margin-top:0; margin-bottom:0; text-align:center; "></label>
+                <div class="inputs" style="display:flex; margin-top:0; padding-top:0;">
+                    <!--<label for="minlbl" class="form__label" style="margin-top:2em;">Mín: </label> <br/>
+                    <input type="number" name="rango_min" id="range_min" class="form__input" min="0"
+                        max="99999" style="margin:1em;" value="10"/><br />-->
+                    <label for="maxlbl" class="form__label" style="margin-top:1.4em; padding-bottom:em;">Number of
+                        outputs: </label>
+                    <input type="number" name="rango_max" id="range_max" class="form__input" min="0" max="99999"
+                        style="margin:1em;" value="30" /><br />
+                </div>
+                <div style="margin-top:4em;">
+                    <button class="big-button semilla" type="submit" onclick="aleatorio();"
+                        style="width:80%; margin-left:5%;">
+                        Generate random numbers with mersenenne19937</button><br />
+                    <button class="big-button" type="reset" style="width:50%; margin-left:20%;">Reset</button><br />
+                </div>
             </form>
         </div>
     </div>
 
     <script>
-        function aleatorio() {
-            let resultado = document.getElementById("seed_value").value;
-            document.getElementById("resultado").innerHTML = resultado;
-            event.preventDefault();
+        function unsigned32(n1) {
+            return n1 < 0 ? (n1 ^ this.upperMask) + this.upperMask : n1;
         }
+
+        function mersenenne_19937(seed = 123) {
+            this.state = [];
+            this.f = 1812433253;
+            this.m = 397;
+            this.tempU = 11;
+            this.tempS = 7;
+            this.tempB = 0x9D2C5680;
+            this.tempD = 0xffffffff;
+            this.tempA = 0x9908b0df;
+            this.tempT = 15;
+            this.tempC = 0xEFC60000;
+            this.tempL = 18;
+            this.index = 624;
+            this.lowMask = 0x7fffffff;
+            this.upperMask = 0x80000000;
+            this.state[0] = seed;
+
+            function unsigned32(n1) {
+                return n1 < 0 ? (n1 ^ this.upperMask) + this.upperMask : n1;
+            }
+
+            function substraction32(n1, n2) {
+                return n1 < n2 ? unsigned32((0x100000000 - (n2 - n1)) & this.tempD) : n1 - n2;
+            }
+
+            function addition32(n1, n2) {
+                return unsigned32((n1 + n2) & this.tempD);
+            }
+
+            function multiplication32(n1, n2) {
+                let sum = 0;
+                for (let i = 0; i < 32; ++i) {
+                    if ((n1 >>> i) & 0x1) {
+                        sum = addition32(sum, unsigned32(n2 << i));
+                    }
+                }
+                return sum;
+            }
+            for (let i = 1; i < 624; ++i) {
+                /*this.state[i] = this.int_32_c(this.f * (((this.state[i - 1] ^ (this.state[i - 1]) >>> (30))) >>> 0) +
+                    i) >>> 0;*/
+                this.state[i] = addition32(multiplication32(1812433253, unsigned32(this.state[i - 1] ^ (this.state[i -
+                    1] >>> 30))), i);
+                //console.log(this.state[i], ": datos")            
+            }
+        }
+        function unsigned32(n1) {
+            return n1 < 0 ? (n1 ^ this.upperMask) + this.upperMask : n1;
+        }
+
+        function addition32(n1, n2) {
+            return unsigned32((n1 + n2) & 0xffffffff);
+        }
+        /*
+            this.state[i] = this.int_32_c(this.f * (((this.state[i - 1] ^ (this.state[i - 1]) >>> (this.lowMask -
+            2))) >>> 0) + i) >>> 0;
+        */
+        function int_32_c(num) {
+            return (parseInt(0xFFFFFFFF & num)) >>> 0;
+        }
+
+        function twist() {
+            for (let i = 0; i < 624; i++) {
+                /*let temp = this.unsigned32((this.state[i] & this.upperMask) + (this.state[(i + 1) % 624] & this
+                    .lowMask)) >>> 0;*/
+
+                let temp = this.addition32((this.state[i] & this.upperMask), (this.state[(i + 1) % 624] &
+                    this
+                    .lowMask));
+                //console.log(temp, "temp")
+                let temp_shift = this.unsigned32(temp >>> 1);
+
+                if (temp % 2 != 0) {
+                    temp_shift = this.unsigned32((temp_shift ^ this.tempA) >>> 0); /// Números sin signo negativo
+                    //console.log(temp_shift, "temp_shift")
+                }
+                this.state[i] = this.unsigned32((this.state[(i + this.m) % 624] ^ temp_shift) >>> 0);
+                //console.log(this.state[i], "here");
+            }
+            this.index = 0;
+        }
+
+        function get_random_number() {
+            if (this.index >= 624) {
+                this.twist();
+            }
+            let y = this.state[this.index];
+            y = ((y ^ (y >>> this.tempU) & this.tempD) >>> 0);
+            y = (y ^ ((y << this.tempS) & this.tempB) >>> 0);
+            y = (y ^ ((y << this.tempT) & this.tempC) >>> 0);
+            y = (y ^ (y >>> this.tempL) >>> 0);
+            this.index += 1;
+            return this.unsigned32(y);
+        }
+
+
+        function aleatorio() {
+            document.getElementById("resultado").innerHTML = "";
+            let semilla = document.getElementById("seed_value").value;
+            //let minRange = document.getElementById("range_min").value;
+            let maxRange = document.getElementById("range_max").value;
+            event.preventDefault();
+            this.mersenenne_19937(semilla);
+            for (let i = 0; i < maxRange; i++) {
+                document.getElementById("resultado").innerHTML += get_random_number();
+                document.getElementById("resultado").innerHTML += "\n";
+            }
+        }
+
+        // Algunas funciones fueron tomadas de aquí para evitar el overflow en los 32-bits de capacidad númerica en JavaScript
+        // https://github.com/josephg/Chipmunk-js/blob/4c5241b24b3f234a21b60ef3529497d581320842/benchmark/mersenne.js
+        // Pseudocode: https://en.wikipedia.org/wiki/Mersenne_Twister
+        // Por Michel Lujano
     </script>
 </body>
 
